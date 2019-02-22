@@ -19,11 +19,12 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     services.register(middlewares)
     
     // Configure a database
-    let dbConfig = PostgreSQLDatabaseConfig(hostname: "localhost",
-                                            port: 5432,
-                                            username: "hexa-desmond.tham",
-                                            database: "`",
-                                            password: nil)
+    let dbConfig: PostgreSQLDatabaseConfig
+    if let url = Environment.get("DATABASE_URL"), let psqlConfig = PostgreSQLDatabaseConfig(url: url) {
+        dbConfig = psqlConfig
+    } else {
+        dbConfig = PostgreSQLDatabaseConfig(hostname: "localhost", port: 5432, username: "hexa-desmond.tham", database: "BattleBunker", password: nil)
+    }
     let postgresql = try PostgreSQLDatabase(config: dbConfig)
     
     /// Register the configured SQLite database to the database config.
